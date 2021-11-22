@@ -9,33 +9,6 @@ import os
 import re
 import subprocess
 
-def make_home(info):
-    """
-    make a home directory for user (dictionary)
-    """
-    home = info["home"]
-    perm = info["home_perm"]
-    uid_num = int(info["uid"])
-    gid_num = int(info["gid"])
-    pub_keys = info["authorized_keys"]
-    parent_dir = os.path.dirname(home)
-    dot_ssh = "{}/.ssh".format(home)
-    authorized_keys = "{}/authorized_keys".format(dot_ssh)
-    os.makedirs(parent_dir, exist_ok=True, mode=0o755)
-    os.chown(parent_dir, uid=0, gid=0)
-    os.makedirs(home, exist_ok=True,
-                mode=int(perm, 8))
-    os.chown(home, uid=uid_num, gid=gid_num)
-    if pub_keys:
-        os.makedirs(dot_ssh, exist_ok=True, mode=0o700)
-        os.chown(dot_ssh, uid=uid_num, gid=gid_num)
-        if not os.path.exists(authorized_keys):
-            with open(authorized_keys, "w") as auth_key_wp:
-                auth_key_wp.write(pub_keys)
-            os.chown(authorized_keys, uid=uid_num, gid=gid_num)
-            os.chmod(authorized_keys, 0o600)
-    return 0                    # OK
-
 def run(cmd, check=False, **kw):
     """
     run a command
@@ -105,6 +78,16 @@ def get_next_gid(ldap_domain, ldap_passwd, firstgid):
     """
     return get_next_val_for_attr(ldap_domain, ldap_passwd, "gidNumber", firstgid)
 
+def search_for_key(ldap_domain, ldap_passwd, key):
+    dic = {"ldap_domain" : ldap_domain,
+           "ldap_passwd" : ldap_passwd,
+           "key" : key}
+    search_cmd = ("ldapsearch -x -w {ldap_passwd}"
+                  " -D cn=admin,{ldap_domain} -b {key}"
+                  .format(**dic))
+    comp = run(search_cmd, capture_output=False)
+    return comp.returncode
+
 def add_ldif_if_not_exist(ldap_domain, ldap_passwd, key, gen_ldif):
     """
     add user to LDAP if it does not exist
@@ -128,7 +111,7 @@ def add_ldif_if_not_exist(ldap_domain, ldap_passwd, key, gen_ldif):
         print("error during adding {key}".format(**dic))
     return comp.returncode
 
-def mod_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
+def modify_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
     """
     add user to LDAP if it does not exist
     """
@@ -175,6 +158,14 @@ def del_key_if_exist(ldap_domain, ldap_passwd, key):
         print("error during deleting {key}".format(**dic))
     return comp.returncode
 
+def list_users(info):
+    key = "ou=people,{ldap_domain}".format(**info)
+    return search_for_key(info["ldap_domain"], info["ldap_passwd"], key)
+    
+def list_groups(info):
+    key = "ou=groups,{ldap_domain}".format(**info)
+    return search_for_key(info["ldap_domain"], info["ldap_passwd"], key)
+    
 def addgroup(info):
     """
     add a group to LDAP if it does not exist
@@ -213,6 +204,33 @@ homeDirectory: {home}
 """.format(**info))
         return ldif
     return add_ldif_if_not_exist(info["ldap_domain"], info["ldap_passwd"], key, gen_ldif)
+
+def make_home(info):
+    """
+    make a home directory for user (dictionary)
+    """
+    home = info["home"]
+    perm = info["home_perm"]
+    uid_num = int(info["uid"])
+    gid_num = int(info["gid"])
+    pub_keys = info["authorized_keys"]
+    parent_dir = os.path.dirname(home)
+    dot_ssh = "{}/.ssh".format(home)
+    authorized_keys = "{}/authorized_keys".format(dot_ssh)
+    os.makedirs(parent_dir, exist_ok=True, mode=0o755)
+    os.chown(parent_dir, uid=0, gid=0)
+    os.makedirs(home, exist_ok=True,
+                mode=int(perm, 8))
+    os.chown(home, uid=uid_num, gid=gid_num)
+    if pub_keys:
+        os.makedirs(dot_ssh, exist_ok=True, mode=0o700)
+        os.chown(dot_ssh, uid=uid_num, gid=gid_num)
+        if not os.path.exists(authorized_keys):
+            with open(authorized_keys, "w") as auth_key_wp:
+                auth_key_wp.write(pub_keys)
+            os.chown(authorized_keys, uid=uid_num, gid=gid_num)
+            os.chmod(authorized_keys, 0o600)
+    return 0                    # OK
 
 def add_user_to_group(info, extra_group):
     """
