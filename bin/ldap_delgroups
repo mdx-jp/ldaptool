@@ -33,7 +33,7 @@ def delgroups_of_opt(opts):
         for i, row in enumerate(rows):
             row.update(opts.__dict__)
             err = ldaptool.delgroup(row)
-            if err > 0:
+            if err:
                 print("{groups_csv}:{line}: error occurred"
                       .format(groups_csv=groups_csv, line=i + 1))
             any_err = any_err or err

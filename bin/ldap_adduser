@@ -71,7 +71,8 @@ def parse_args(argv):
     parser.add_argument("--no-create-home", default=False, action="store_true",
                         help="does not create home directory")
     parser.add_argument("--home-perm", help="home directory permission")
-    parser.add_argument("--authorized-keys", "--authorized_keys", help="authorized_keys")
+    parser.add_argument("--authorized-keys", "--authorized_keys",
+                        help="authorized_keys")
     parser.add_argument("--shell", help="shell")
     parser.add_argument("--uid", help="uid")
     parser.add_argument("--gid", help="gid")
@@ -79,9 +80,11 @@ def parse_args(argv):
     parser.add_argument("--firstuid", type=int, help="uid")
     parser.add_argument("--password", help="password")
     parser.add_argument("--password-hash", help="password hash")
-    parser.add_argument("--groups", nargs="*", default=[], help="add user to these groups")
+    parser.add_argument("--groups", nargs="*",
+                        default=[], help="add user to these groups")
     parser.add_argument("--ldap-passwd", help="LDAP domain password")
-    parser.add_argument("--ldap-domain", help="LDAP domain (e.g., dc=myldap,dc=mdx,dc=jp")
+    parser.add_argument("--ldap-domain",
+                        help="LDAP domain (e.g., dc=myldap,dc=mdx,dc=jp")
     args = parser.parse_args(argv[1:])
     return args
 

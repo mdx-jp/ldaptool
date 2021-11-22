@@ -103,7 +103,7 @@ def add_ldif_if_not_exist(ldap_domain, ldap_passwd, key, gen_ldif):
                .format(**dic))
     if run(search_cmd).returncode == 0:
         print("{key} already exists".format(**dic))
-        return -1
+        return 0                # OK
     comp = run(add_cmd, check=True, input=gen_ldif())
     if comp.returncode == 0:
         print("added {key}".format(**dic))
@@ -150,7 +150,7 @@ def del_key_if_exist(ldap_domain, ldap_passwd, key):
                .format(**dic))
     if run(search_cmd).returncode != 0:
         print("{key} does not exist".format(**dic))
-        return -1
+        return 0                # OK
     comp = run(del_cmd, check=True)
     if comp.returncode == 0:
         print("deleted {key}".format(**dic))
@@ -251,20 +251,17 @@ def adduser_group_home(info):
     add user, its primary group, and home dir
     """
     err = adduser(info)
-    if err == -1:
-        # user exists, no more action
-        return 0
-    elif err > 0:
+    if err:
         return err
     err = addgroup(info)
-    if err > 0:
+    if err:
         return err
     err = 0 if info["no_create_home"] else make_home(info)
-    if err > 0:
+    if err:
         return err
     for extra_group in info["groups"]:
         err = add_user_to_group(info, extra_group)
-        if err > 0:
+        if err:
             return err
     return err
 

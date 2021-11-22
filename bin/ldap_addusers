@@ -69,7 +69,7 @@ def addusers_of_opt(opts):
             row.update(opts.__dict__)
             info_set_defaults(row)
             err = ldaptool.adduser_group_home(row)
-            if err > 0:
+            if err:
                 print("{users_csv}:{line}: error occurred".format(users_csv=users_csv, line=i + 1))
             any_err = any_err or err
             if any_err and opts.exit_on_error:

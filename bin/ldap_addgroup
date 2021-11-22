@@ -29,6 +29,8 @@ def addgroup_of_opt(opts):
     opts = opts_set_defaults(opts)
     opts_dict = opts.__dict__
     err = ldaptool.addgroup(opts_dict)
+    if err == -1:
+        err = 0
     return err
 
 def parse_args(argv):
