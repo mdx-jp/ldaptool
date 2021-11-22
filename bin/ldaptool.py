@@ -111,15 +111,16 @@ def add_ldif_if_not_exist(ldap_domain, ldap_passwd, key, gen_ldif):
         print("error during adding {key}".format(**dic))
     return comp.returncode
 
-def modify_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
+def add_attr_val_ldif(ldap_domain, ldap_passwd, key, filt, gen_ldif):
     """
     add user to LDAP if it does not exist
     """
     dic = {"ldap_domain" : ldap_domain,
            "ldap_passwd" : ldap_passwd,
-           "key" : key}
+           "key" : key,
+           "filter" : filt}
     search_cmd = ("ldapsearch -x -w {ldap_passwd}"
-                  " -D cn=admin,{ldap_domain} -b {key}"
+                  " -D cn=admin,{ldap_domain} -b {key} '{filter}'"
                   .format(**dic))
     mod_cmd = ("ldapmodify -x -w {ldap_passwd}"
                " -D cn=admin,{ldap_domain}"
@@ -128,6 +129,9 @@ def modify_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
     if comp.returncode != 0:
         print("{key} does not exist".format(**dic))
         return comp.returncode
+    if key in comp.stdout:
+        print("{key} exists and already has {filter}".format(**dic))
+        return 0
     comp = run(mod_cmd, check=True, input=gen_ldif())
     if comp.returncode == 0:
         print("modified {key}".format(**dic))
@@ -238,13 +242,15 @@ def add_user_to_group(info, extra_group):
     """
     key = ("cn={extra_group},ou=groups,{ldap_domain}"
            .format(extra_group=extra_group, **info))
+    filt = "(memberUid={user})".format(**info)
     def gen_ldif():
         ldif = ("""dn: cn={extra_group},ou=groups,{ldap_domain}
 changetype: modify
 add: memberUid
 memberUid: {user}""".format(extra_group=extra_group, **info))
         return ldif
-    return modify_ldif(info["ldap_domain"], info["ldap_passwd"], key, gen_ldif)
+    return add_attr_val_ldif(info["ldap_domain"], info["ldap_passwd"],
+                             key, filt, gen_ldif)
 
 def adduser_group_home(info):
     """
