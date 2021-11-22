@@ -40,10 +40,11 @@ def info_set_defaults(info):
     set_if_empty(info, "home_perm", "0700")
     set_if_empty(info, "authorized_keys", "")
     set_if_empty(info, "shell", "/bin/bash")
-    set_if_empty(info, "group", info["user"])
+    set_if_empty(info, "grp", info["user"])
     if info.get("uid", "") == "":
         info["uid"] = ldaptool.get_next_uid(info["ldap_domain"],
-                                            info["ldap_passwd"], info["firstuid"])
+                                            info["ldap_passwd"],
+                                            info["firstuid"])
     if info.get("gid", "") == "":
         info["gid"] = info["uid"]
     info["groups"] = info["groups"].strip().split()

@@ -34,7 +34,8 @@ def delusers_of_opt(opts):
             row.update(opts.__dict__)
             err = ldaptool.deluser(row)
             if err > 0:
-                print("{users_csv}:{line}: error occurred".format(users_csv=users_csv, line=i + 1))
+                print("{users_csv}:{line}: error occurred"
+                      .format(users_csv=users_csv, line=i + 1))
             any_err = any_err or err
             if any_err and opts.exit_on_error:
                 return any_err

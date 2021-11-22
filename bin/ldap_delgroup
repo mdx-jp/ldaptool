@@ -32,7 +32,7 @@ def parse_args(argv):
     parse comand line args
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("group", help="group to delete")
+    parser.add_argument("grp", help="group to delete")
     parser.add_argument("--ldap-passwd", help="LDAP domain password")
     parser.add_argument("--ldap-domain", help="LDAP domain (e.g., dc=myldap,dc=mdx,dc=jp")
     args = parser.parse_args(argv[1:])

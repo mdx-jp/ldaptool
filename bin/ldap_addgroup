@@ -36,7 +36,7 @@ def parse_args(argv):
     parse comand line args
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("group", help="user to create")
+    parser.add_argument("grp", help="group to create")
     parser.add_argument("--gid", help="gid")
     parser.add_argument("--firstgid", type=int, help="first gid")
     parser.add_argument("--ldap-passwd", help="LDAP domain password")

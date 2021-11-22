@@ -27,7 +27,8 @@ def info_set_defaults(info):
     """
     if info.get("gid", "") == "":
         info["gid"] = ldaptool.get_next_gid(info["ldap_domain"],
-                                            info["ldap_passwd"], info["firstgid"])
+                                            info["ldap_passwd"],
+                                            info["firstgid"])
 
 def addgroups_of_opt(opts):
     """

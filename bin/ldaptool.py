@@ -128,7 +128,7 @@ def add_ldif_if_not_exist(ldap_domain, ldap_passwd, key, gen_ldif):
         print("error during adding {key}".format(**dic))
     return comp.returncode
 
-def mod_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
+def modify_ldif(ldap_domain, ldap_passwd, key, gen_ldif):
     """
     add user to LDAP if it does not exist
     """
@@ -179,11 +179,11 @@ def addgroup(info):
     """
     add a group to LDAP if it does not exist
     """
-    key = "cn={group},ou=groups,{ldap_domain}".format(**info)
+    key = "cn={grp},ou=groups,{ldap_domain}".format(**info)
     def gen_ldif():
-        ldif = ("""dn: cn={group},ou=groups,{ldap_domain}
+        ldif = ("""dn: cn={grp},ou=groups,{ldap_domain}
 objectClass: posixGroup
-cn: {group}
+cn: {grp}
 gidNumber: {gid}
 """.format(**info))
         return ldif
@@ -226,16 +226,19 @@ changetype: modify
 add: memberUid
 memberUid: {user}""".format(extra_group=extra_group, **info))
         return ldif
-    return mod_ldif(info["ldap_domain"], info["ldap_passwd"], key, gen_ldif)
+    return modify_ldif(info["ldap_domain"], info["ldap_passwd"], key, gen_ldif)
 
 def adduser_group_home(info):
     """
     add user, its primary group, and home dir
     """
-    err = addgroup(info)
-    if err > 0:
-        return err
     err = adduser(info)
+    if err == -1:
+        # user exists, no more action
+        return 0
+    elif err > 0:
+        return err
+    err = addgroup(info)
     if err > 0:
         return err
     err = 0 if info["no_create_home"] else make_home(info)
@@ -251,7 +254,7 @@ def delgroup(info):
     """
     delete group given in info
     """
-    key = "cn={group},ou=groups,{ldap_domain}".format(**info)
+    key = "cn={grp},ou=groups,{ldap_domain}".format(**info)
     return del_key_if_exist(info["ldap_domain"], info["ldap_passwd"], key)
 
 def deluser(info):

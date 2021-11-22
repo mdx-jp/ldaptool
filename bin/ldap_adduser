@@ -38,11 +38,12 @@ def opts_set_defaults(opts):
         opts.firstuid = 10000
     if opts.ingroup is None:
         opts.ingroup = opts.user
-    opts.group = opts.ingroup
+    opts.grp = opts.ingroup
     if opts.uid is None:
         opts.uid = ldaptool.get_next_uid(opts.ldap_domain, opts.ldap_passwd, opts.firstuid)
     if opts.gid is None:
         opts.gid = opts.uid
+    # do not ask hear but when actually necessary
     if 0 and opts.password_hash is None:
         if opts.password is None:
             opts.password = ldaptool.ask_password(opts.user)
@@ -74,7 +75,7 @@ def parse_args(argv):
     parser.add_argument("--shell", help="shell")
     parser.add_argument("--uid", help="uid")
     parser.add_argument("--gid", help="gid")
-    parser.add_argument("--ingroup", help="group")
+    parser.add_argument("--ingroup", help="primary group of the new user")
     parser.add_argument("--firstuid", type=int, help="uid")
     parser.add_argument("--password", help="password")
     parser.add_argument("--password-hash", help="password hash")
