@@ -18,7 +18,7 @@ def run(cmd, info, check=False, **kw):
                 "capture_output" : True}
     run_opts.update(kw)
     if info["verbose"]:
-        print(f"cmd: {cmd}")
+        print(f"cmd: {cmd}", flush=True)
     if info["run"]:
         comp = subprocess.run(cmd, check=check, **run_opts)
     else:
