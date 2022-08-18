@@ -303,9 +303,15 @@ def get_default_ldap_domain():
                 return matched.group("dom")
     return ""
 
-def get_default_ldap_passwd():
+def get_default_ldap_passwd_really():
     """
     get ldap passwd
     """
     with open("/etc/ldap.secret") as pwd_fp:
         return pwd_fp.read()
+
+def get_default_ldap_passwd():
+    """                                                                         
+    get ldap passwd                                                             
+    """
+    return "$(cat /etc/ldap.secret)"
