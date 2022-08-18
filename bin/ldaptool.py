@@ -21,6 +21,8 @@ def run(cmd, info, check=False, **kw):
         print(f"cmd: {cmd}")
     if info["run"]:
         comp = subprocess.run(cmd, check=check, **run_opts)
+    else:
+        comp = subprocess.run("true")
     return comp
 
 def slappasswd(passwd, info):
