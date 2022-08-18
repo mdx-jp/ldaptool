@@ -19,7 +19,7 @@ def opts_set_defaults(opts):
     if opts.firstgid is None:
         opts.firstgid = 5000
     if opts.gid is None:
-        opts.gid = ldaptool.get_next_gid(opts.ldap_domain, opts.ldap_passwd, opts.firstgid)
+        opts.gid = ldaptool.get_next_gid(opts.ldap_domain, opts.ldap_passwd, opts.firstgid, opts)
     return opts
 
 def addgroup_of_opt(opts):
