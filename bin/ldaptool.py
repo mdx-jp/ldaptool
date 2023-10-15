@@ -273,8 +273,8 @@ memberUid: {info["user"]}'''
     return add_attr_val_ldif(info["ldap_domain"], info["ldap_passwd"],
                              key, filt, gen_ldif, info)
 
-def add_passwd_file(info):
-    passwd_file = info.get("passwd_file")
+def add_password_file(info):
+    passwd_file = info.get("password_file")
     passwd = info.get("password")
     if passwd_file and passwd:
         home = info["home"]
@@ -309,7 +309,7 @@ def adduser_group_home(info):
         err = add_user_to_group(info, extra_group)
         if err:
             return err
-    err = add_passwd_file(info)
+    err = add_password_file(info)
     return err
 
 def delgroup(info):
