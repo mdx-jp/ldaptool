@@ -273,9 +273,28 @@ memberUid: {info["user"]}'''
     return add_attr_val_ldif(info["ldap_domain"], info["ldap_passwd"],
                              key, filt, gen_ldif, info)
 
+def add_passwd_file(info):
+    passwd_file = info.get("passwd_file")
+    passwd = info.get("password")
+    if passwd_file and passwd:
+        home = info["home"]
+        passwd_file_abs = f'{home}/{passwd_file}'
+        with open(passwd_file_abs, "w") as wp:
+            wp.write(f"""Your initial passwd is {passwd} 
+Change it by passwd command and remove this file.
+""")
+        uid_num = int(info["uid"])
+        gid_num = int(info["gid"])
+        os.chown(passwd_file_abs, uid=uid_num, gid=gid_num)
+        os.chmod(passwd_file_abs, 0o600)
+    return 0
+    
 def adduser_group_home(info):
     """
-    add user, its primary group, and home dir
+    add user, its primary group, and home dir.
+    add the user to the specified groups.
+    optionally put a password file into the user's home dir,
+    with the name README_AND_CHANGE_PASSWD
     """
     err = adduser(info)
     if err:
@@ -290,6 +309,7 @@ def adduser_group_home(info):
         err = add_user_to_group(info, extra_group)
         if err:
             return err
+    err = add_passwd_file(info)
     return err
 
 def delgroup(info):
